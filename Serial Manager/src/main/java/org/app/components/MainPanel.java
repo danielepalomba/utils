@@ -18,10 +18,7 @@ public class MainPanel extends JPanel {
     //font
     Font boldFont = new Font("SansSerif", Font.BOLD, 14);
 
-    private CommandPanel commandPanel;
-    private JTextArea textArea;
-    private JScrollPane scrollPane;
-    private Menu menu;
+    private final JTextArea textArea;
 
     public MainPanel() {
         setLayout(null);
@@ -30,15 +27,15 @@ public class MainPanel extends JPanel {
 
         //textArea
         textArea = new JTextArea();
-        scrollPane = new JScrollPane(textArea);
+        JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setBounds(scrollPanelX, scrollPanelY, areaWidth, areaHeight);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         textArea.setFont(boldFont);
 
-        commandPanel = new CommandPanel(this);
+        CommandPanel commandPanel = new CommandPanel(this);
 
         //Menu
-        menu = new Menu(this);
+        Menu menu = new Menu(this);
 
         //JLabel
         add(menu);
@@ -48,35 +45,7 @@ public class MainPanel extends JPanel {
         revalidate();
     }
 
-    public Font getBoldFont() {
-        return boldFont;
-    }
-
-    public void setBoldFont(Font boldFont) {
-        this.boldFont = boldFont;
-    }
-
-    public CommandPanel getCommandPanel() {
-        return commandPanel;
-    }
-
-    public void setCommandPanel(CommandPanel commandPanel) {
-        this.commandPanel = commandPanel;
-    }
-
     public JTextArea getTextArea() {
         return textArea;
-    }
-
-    public void setTextArea(JTextArea textArea) {
-        this.textArea = textArea;
-    }
-
-    public JScrollPane getScrollPane() {
-        return scrollPane;
-    }
-
-    public void setScrollPane(JScrollPane scrollPane) {
-        this.scrollPane = scrollPane;
     }
 }

@@ -87,4 +87,12 @@ public class EnvFileManager {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    public static String getFormattedCredentials(){
+        Map<String, String> envVars = readEnvFile();
+        String email = envVars.get("EMAIL");
+        String password = envVars.get("PASSWORD");
+
+        return "Email: " + email + "\n" + "Password: " + password + "\n";
+    }
 }

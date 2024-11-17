@@ -1,22 +1,26 @@
 package org.app.components;
 
 import org.app.exception.NotEmptyArea;
+import org.app.util.EnvFileManager;
+import org.app.util.ExtractList;
 import org.app.util.FileManager;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class Menu extends JMenuBar {
 
     private final MainPanel mainPanel;
+
     private JMenuItem exit;
     private JMenuItem importFile;
+    private JMenuItem exportFile;
     private JMenuItem sendViaMail;
+    private JMenuItem credentials;
+    private JMenuItem showCredentials;
 
     //variabile di controllo
-    private SenderMailFrame senderMailFrame;
+    private EmailSenderFrame senderMailFrame;
 
     public Menu(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -24,6 +28,11 @@ public class Menu extends JMenuBar {
         setExitFunct();
         setImportFileFunct();
         setSendViaMailFunct();
+        setExportFileFunct();
+        setCredentialsFunct();
+        setShowCredentialsFunct();
+
+        setItemInMenu();
 
         setBounds(0, 0, MainPanel.width, MainPanel.height / 30);
 
@@ -32,26 +41,22 @@ public class Menu extends JMenuBar {
     private void setExitFunct() {
         exit = new JMenuItem("Exit");
         setExitActionListener();
-        this.add(exit);
     }
 
     private void setExitActionListener() {
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    terminateProg();
-                } catch (Exception ex) {
-                    int i = JOptionPane.showConfirmDialog(
-                            null,
-                            ex.getMessage(),
-                            "I dati andranno persi",
-                            JOptionPane.OK_CANCEL_OPTION
-                    );
+        exit.addActionListener(e -> {
+            try {
+                terminateProg();
+            } catch (Exception ex) {
+                int i = JOptionPane.showConfirmDialog(
+                        null,
+                        ex.getMessage(),
+                        "I dati andranno persi",
+                        JOptionPane.OK_CANCEL_OPTION
+                );
 
-                    if (i == JOptionPane.OK_OPTION) {
-                        System.exit(0);
-                    }
+                if (i == JOptionPane.OK_OPTION) {
+                    System.exit(0);
                 }
             }
         });
@@ -66,19 +71,36 @@ public class Menu extends JMenuBar {
     }
 
     private void setImportFileFunct(){
-        importFile = new JMenuItem("Import");
+        importFile = new JMenuItem("Importa");
         setImportFileAction();
-        this.add(importFile);
     }
 
     private void setImportFileAction(){
-        importFile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                List<String> serials = FileManager.importFromFile();
-                mainPanel.getTextArea().setText("");
-                mainPanel.getTextArea().repaint();
-                mainPanel.getTextArea().setText(String.join("\n", serials));
+        importFile.addActionListener(e -> {
+            List<String> serials = FileManager.importFromFile();
+            mainPanel.getTextArea().setText("");
+            mainPanel.getTextArea().repaint();
+            mainPanel.getTextArea().setText(String.join("\n", serials));
+        });
+    }
+
+    private void setExportFileFunct(){
+        exportFile = new JMenuItem("Esporta");
+        setExportFileAction();
+    }
+
+    private void setExportFileAction(){
+        exportFile.addActionListener(e -> {
+            try {
+                if(mainPanel.getTextArea().getText().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Non ci sono seriali", "Attenzione!", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }else {
+                    List<String> serials = ExtractList.extractSerialsToSave(mainPanel.getTextArea().getText());
+                    FileManager.saveToFile(serials);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Attenzione!", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -86,22 +108,73 @@ public class Menu extends JMenuBar {
     private void setSendViaMailFunct(){
         sendViaMail = new JMenuItem("Invia mail");
         setSendViaMailAction();
-        this.add(sendViaMail);
     }
 
     private void setSendViaMailAction(){
-        sendViaMail.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(senderMailFrame == null || !senderMailFrame.isDisplayable()) {
-                    SwingUtilities.invokeLater(()->{
-                        senderMailFrame = new SenderMailFrame();
-                    });
-                }else{
-                    senderMailFrame.toFront();
-                    senderMailFrame.requestFocus();
-                }
+        sendViaMail.addActionListener(e -> {
+            if(senderMailFrame == null || !senderMailFrame.isDisplayable()) {
+                SwingUtilities.invokeLater(()-> senderMailFrame = new EmailSenderFrame(mainPanel));
+            }else{
+                senderMailFrame.toFront();
+                senderMailFrame.requestFocus();
             }
         });
+    }
+
+    private void setCredentialsFunct(){
+        credentials = new JMenuItem("Imposta Credenziali");
+        setCredentialsAction();
+    }
+
+    private void setCredentialsAction(){
+        credentials.addActionListener(e -> {
+            String email = "";
+            String password = "";
+
+            while (email.isEmpty()) {
+                email = JOptionPane.showInputDialog("Email:");
+                if (email != null && email.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Il campo 'Email' è necessario!", "Attenzione!", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            while(password.isEmpty()) {
+                password = JOptionPane.showInputDialog("Password:");
+                if (password != null && password.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Il campo 'Password' è necessario!", "Attenzione!", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            EnvFileManager.updateEnvFile(email, password);
+        });
+    }
+
+    private void setShowCredentialsFunct(){
+        showCredentials = new JMenuItem("Mostra Credenziali");
+        setShowCredentialsAction();
+    }
+
+    private void setShowCredentialsAction(){
+        showCredentials.addActionListener(e -> {
+            JOptionPane.showMessageDialog(null, EnvFileManager.getFormattedCredentials(), "Le tue credenziali", JOptionPane.INFORMATION_MESSAGE);
+        });
+    }
+
+    private void setItemInMenu(){
+        JMenu emailMenu = new JMenu("Email");
+        JMenu fileMenu = new JMenu("File");
+        JMenu helpMenu = new JMenu("Help");
+
+        helpMenu.add(exit);
+        emailMenu.add(sendViaMail);
+        emailMenu.add(credentials);
+        emailMenu.add(showCredentials);
+
+        fileMenu.add(importFile);
+        fileMenu.add(exportFile);
+
+        add(fileMenu);
+        add(emailMenu);
+        add(helpMenu);
     }
 }
