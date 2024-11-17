@@ -1,11 +1,15 @@
 package org.app;
 
 import org.app.components.MainPanel;
+import org.app.util.EnvFileManager;
 
 import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
+
+        EnvFileManager.initializeEnvFile();
+
         SwingUtilities.invokeLater(() -> {
             JFrame window = new JFrame();
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

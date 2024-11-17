@@ -13,12 +13,17 @@ public class Menu extends JMenuBar {
     private final MainPanel mainPanel;
     private JMenuItem exit;
     private JMenuItem importFile;
+    private JMenuItem sendViaMail;
+
+    //variabile di controllo
+    private SenderMailFrame senderMailFrame;
 
     public Menu(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
 
         setExitFunct();
         setImportFileFunct();
+        setSendViaMailFunct();
 
         setBounds(0, 0, MainPanel.width, MainPanel.height / 30);
 
@@ -74,6 +79,28 @@ public class Menu extends JMenuBar {
                 mainPanel.getTextArea().setText("");
                 mainPanel.getTextArea().repaint();
                 mainPanel.getTextArea().setText(String.join("\n", serials));
+            }
+        });
+    }
+
+    private void setSendViaMailFunct(){
+        sendViaMail = new JMenuItem("Invia mail");
+        setSendViaMailAction();
+        this.add(sendViaMail);
+    }
+
+    private void setSendViaMailAction(){
+        sendViaMail.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(senderMailFrame == null || !senderMailFrame.isDisplayable()) {
+                    SwingUtilities.invokeLater(()->{
+                        senderMailFrame = new SenderMailFrame();
+                    });
+                }else{
+                    senderMailFrame.toFront();
+                    senderMailFrame.requestFocus();
+                }
             }
         });
     }
