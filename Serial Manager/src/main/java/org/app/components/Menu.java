@@ -1,9 +1,10 @@
 package org.app.components;
 
 import org.app.exception.NotEmptyArea;
-import org.app.util.EnvFileManager;
+import org.app.util.backup.Backuper;
+import org.app.util.filemanager.EnvFileManager;
 import org.app.util.ExtractList;
-import org.app.util.FileManager;
+import org.app.util.filemanager.ImportExportFileManager;
 
 import javax.swing.*;
 import java.util.List;
@@ -46,8 +47,19 @@ public class Menu extends JMenuBar {
     private void setExitActionListener() {
         exit.addActionListener(e -> {
             try {
-                terminateProg();
+                if (mainPanel.getTextArea().getText().isEmpty())
+                    terminateProg();
+                else {
+                    int risp = JOptionPane.showConfirmDialog(null, "Sono presenti dei seriali, vuoi salvarli?", "Attenzione!", JOptionPane.YES_NO_OPTION);
+                    if (risp == JOptionPane.OK_OPTION) {
+                        Backuper.backupSerials(mainPanel.getTextArea().getText());
+                        JOptionPane.showMessageDialog(null, "Salvataggio effettuato!", "Seriali salvati", JOptionPane.INFORMATION_MESSAGE);
+                    } else if (risp == JOptionPane.NO_OPTION) {
+                        terminateProg();
+                    }
+                }
             } catch (Exception ex) {
+
                 int i = JOptionPane.showConfirmDialog(
                         null,
                         ex.getMessage(),
@@ -58,6 +70,7 @@ public class Menu extends JMenuBar {
                 if (i == JOptionPane.OK_OPTION) {
                     System.exit(0);
                 }
+
             }
         });
     }
@@ -70,34 +83,33 @@ public class Menu extends JMenuBar {
         }
     }
 
-    private void setImportFileFunct(){
+    private void setImportFileFunct() {
         importFile = new JMenuItem("Importa");
         setImportFileAction();
     }
 
-    private void setImportFileAction(){
+    private void setImportFileAction() {
         importFile.addActionListener(e -> {
-            List<String> serials = FileManager.importFromFile();
+            List<String> serials = ImportExportFileManager.importFromFile();
             mainPanel.getTextArea().setText("");
             mainPanel.getTextArea().repaint();
             mainPanel.getTextArea().setText(String.join("\n", serials));
         });
     }
 
-    private void setExportFileFunct(){
+    private void setExportFileFunct() {
         exportFile = new JMenuItem("Esporta");
         setExportFileAction();
     }
 
-    private void setExportFileAction(){
+    private void setExportFileAction() {
         exportFile.addActionListener(e -> {
             try {
-                if(mainPanel.getTextArea().getText().isEmpty()){
+                if (mainPanel.getTextArea().getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Non ci sono seriali", "Attenzione!", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }else {
+                } else {
                     List<String> serials = ExtractList.extractSerialsToSave(mainPanel.getTextArea().getText());
-                    FileManager.saveToFile(serials);
+                    ImportExportFileManager.saveToFile(serials);
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Attenzione!", JOptionPane.ERROR_MESSAGE);
@@ -105,28 +117,28 @@ public class Menu extends JMenuBar {
         });
     }
 
-    private void setSendViaMailFunct(){
+    private void setSendViaMailFunct() {
         sendViaMail = new JMenuItem("Invia mail");
         setSendViaMailAction();
     }
 
-    private void setSendViaMailAction(){
+    private void setSendViaMailAction() {
         sendViaMail.addActionListener(e -> {
-            if(senderMailFrame == null || !senderMailFrame.isDisplayable()) {
-                SwingUtilities.invokeLater(()-> senderMailFrame = new EmailSenderFrame(mainPanel));
-            }else{
+            if (senderMailFrame == null || !senderMailFrame.isDisplayable()) {
+                SwingUtilities.invokeLater(() -> senderMailFrame = new EmailSenderFrame(mainPanel));
+            } else {
                 senderMailFrame.toFront();
                 senderMailFrame.requestFocus();
             }
         });
     }
 
-    private void setCredentialsFunct(){
+    private void setCredentialsFunct() {
         credentials = new JMenuItem("Imposta Credenziali");
         setCredentialsAction();
     }
 
-    private void setCredentialsAction(){
+    private void setCredentialsAction() {
         credentials.addActionListener(e -> {
             String email = "";
             String password = "";
@@ -138,7 +150,7 @@ public class Menu extends JMenuBar {
                 }
             }
 
-            while(password.isEmpty()) {
+            while (password.isEmpty()) {
                 password = JOptionPane.showInputDialog("Password:");
                 if (password != null && password.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Il campo 'Password' è necessario!", "Attenzione!", JOptionPane.ERROR_MESSAGE);
@@ -149,18 +161,18 @@ public class Menu extends JMenuBar {
         });
     }
 
-    private void setShowCredentialsFunct(){
+    private void setShowCredentialsFunct() {
         showCredentials = new JMenuItem("Mostra Credenziali");
         setShowCredentialsAction();
     }
 
-    private void setShowCredentialsAction(){
+    private void setShowCredentialsAction() {
         showCredentials.addActionListener(e -> {
             JOptionPane.showMessageDialog(null, EnvFileManager.getFormattedCredentials(), "Le tue credenziali", JOptionPane.INFORMATION_MESSAGE);
         });
     }
 
-    private void setItemInMenu(){
+    private void setItemInMenu() {
         JMenu emailMenu = new JMenu("Email");
         JMenu fileMenu = new JMenu("File");
         JMenu helpMenu = new JMenu("Help");

@@ -1,7 +1,8 @@
 package org.app;
 
 import org.app.components.MainPanel;
-import org.app.util.EnvFileManager;
+import org.app.listeners.MainFrameWindowListener;
+import org.app.util.filemanager.EnvFileManager;
 
 import javax.swing.*;
 
@@ -15,11 +16,11 @@ public class Main {
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             window.setTitle("Gestore seriali");
             window.setResizable(false);
-            window.setLocationRelativeTo(null);
-
             MainPanel mainPanel = new MainPanel();
             window.add(mainPanel);
             window.pack();
+            window.setLocationRelativeTo(null);
+            window.addWindowListener(new MainFrameWindowListener(mainPanel));
             window.setVisible(true);
         });
     }

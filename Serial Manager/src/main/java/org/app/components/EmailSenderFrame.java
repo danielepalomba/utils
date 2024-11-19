@@ -2,7 +2,7 @@ package org.app.components;
 
 import org.app.exception.FieldIncomplete;
 import org.app.mail.MailSender;
-import org.app.util.TextFileGenerator;
+import org.app.mail.TextFileGenerator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -72,7 +72,7 @@ public class EmailSenderFrame extends JFrame {
         JButton sendButton = new JButton("Invia");
 
         sendButton.addActionListener(e -> {
-            String receiver = emailField.getText();
+            String receiver = emailField.getText().toLowerCase();
             String subject = subjectField.getText();
             String body = bodyArea.getText();
             String fileName = fileField.getText();

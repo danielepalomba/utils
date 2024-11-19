@@ -3,7 +3,7 @@ package org.app.mail;
 import jakarta.activation.FileDataSource;
 import org.app.exception.CredentialsNotFound;
 import org.app.exception.InvalidEmailFormat;
-import org.app.util.EnvFileManager;
+import org.app.util.filemanager.EnvFileManager;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
 import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.api.email.Email;
