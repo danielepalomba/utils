@@ -24,4 +24,17 @@ public class ExtractList {
           throw new DuplicateSerials();
         }
     }
+
+    public static List<String> extractTextFromArea(String text){
+        if(text.isEmpty())
+            return null;
+
+        List<String> result = new ArrayList<>();
+        String[] textArray = text.split("\n");
+
+        for (String s : textArray) {
+            result.add(s.trim());
+        }
+        return result;
+    }
 }

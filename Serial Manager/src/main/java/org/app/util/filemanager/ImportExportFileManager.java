@@ -1,6 +1,7 @@
 package org.app.util.filemanager;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +35,12 @@ public class ImportExportFileManager {
 
     public static List<String> importFromFile() {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Scegli un file da importare");
+        fileChooser.setDialogTitle("Scegli un file di testo");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        FileNameExtensionFilter txtFilter = new FileNameExtensionFilter("File di testo (*.txt)", "txt");
+        fileChooser.setFileFilter(txtFilter);
+
         int userSelection = fileChooser.showOpenDialog(null);
         List<String> lines = new ArrayList<>();
 

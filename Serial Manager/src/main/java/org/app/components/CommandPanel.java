@@ -31,7 +31,7 @@ public class CommandPanel extends JPanel {
         checkDuplicateButton.setBounds(buttonX1, buttonY, buttonWidth, buttonHeight);
 
         checkDuplicateButton.addActionListener(e -> {
-            String text = mainPanel.getTextArea().getText();
+            String text = mainPanel.getTextArea().getText().trim();
             if(text.isEmpty()){
                 JOptionPane.showMessageDialog(mainPanel, "Non ci sono seriali", "Attenzione!", JOptionPane.WARNING_MESSAGE);
             }else{

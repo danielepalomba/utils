@@ -26,10 +26,10 @@ public class MainFrameWindowListener implements WindowListener {
 
     @Override
     public void windowClosing(WindowEvent e) {
-        if (!mainPanel.getTextArea().getText().isEmpty()) {
+        if (!mainPanel.isEmptyArea()) {
             int risp = JOptionPane.showConfirmDialog(null, "Sono presenti dei seriali, vuoi salvarli?", "Attenzione!", JOptionPane.YES_NO_OPTION);
             if (risp == JOptionPane.OK_OPTION) {
-                Backuper.backupSerials(mainPanel.getTextArea().getText());
+                Backuper.backupSerials(mainPanel.getTextArea().getText().trim());
                 JOptionPane.showMessageDialog(null, "Salvataggio effettuato!", "Seriali salvati", JOptionPane.INFORMATION_MESSAGE);
             }
         }

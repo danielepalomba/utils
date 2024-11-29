@@ -12,8 +12,12 @@ public class DuplicateFinder {
 
         count = 0;
         for (String s : serialsArray) {
-            serials.add(s.trim());
-            count++;
+            if(!s.isEmpty()){ //not include empty line
+                if(!s.startsWith("#")){ //not include comments
+                    serials.add(s.trim());
+                    count++;
+                }
+            }
         }
 
         return findDuplicates(serials);
@@ -24,8 +28,12 @@ public class DuplicateFinder {
         Set<String> uniqueValues = new HashSet<>();
 
         for(String s : serials) {
-            if(!uniqueValues.add(s))
-                duplicates.add(s);
+            if(!s.isEmpty()){ //not include empty line
+                if(!s.startsWith("#")){ //not include comments
+                    if(!uniqueValues.add(s))
+                        duplicates.add(s);
+                }
+            }
         }
         return duplicates;
     }

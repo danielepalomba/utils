@@ -52,7 +52,7 @@ public class Menu extends JMenuBar {
                 else {
                     int risp = JOptionPane.showConfirmDialog(null, "Sono presenti dei seriali, vuoi salvarli?", "Attenzione!", JOptionPane.YES_NO_OPTION);
                     if (risp == JOptionPane.OK_OPTION) {
-                        Backuper.backupSerials(mainPanel.getTextArea().getText());
+                        Backuper.backupSerials(mainPanel.getTextArea().getText().trim());
                         JOptionPane.showMessageDialog(null, "Salvataggio effettuato!", "Seriali salvati", JOptionPane.INFORMATION_MESSAGE);
                     } else if (risp == JOptionPane.NO_OPTION) {
                         terminateProg();
@@ -110,6 +110,7 @@ public class Menu extends JMenuBar {
                 } else {
                     List<String> serials = ExtractList.extractSerialsToSave(mainPanel.getTextArea().getText());
                     ImportExportFileManager.saveToFile(serials);
+                    mainPanel.getTextArea().setText("");
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Attenzione!", JOptionPane.ERROR_MESSAGE);
