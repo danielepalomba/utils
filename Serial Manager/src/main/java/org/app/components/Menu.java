@@ -5,8 +5,9 @@ import org.app.util.backup.Backuper;
 import org.app.util.filemanager.EnvFileManager;
 import org.app.util.ExtractList;
 import org.app.util.filemanager.ImportExportFileManager;
-
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 public class Menu extends JMenuBar {
@@ -16,9 +17,10 @@ public class Menu extends JMenuBar {
     private JMenuItem exit;
     private JMenuItem importFile;
     private JMenuItem exportFile;
-    private JMenuItem sendViaMail;
+    private JMenuItem sendNewMail;
     private JMenuItem credentials;
     private JMenuItem showCredentials;
+    private JMenu savedUserMenu;
 
     //variabile di controllo
     private EmailSenderFrame senderMailFrame;
@@ -119,12 +121,12 @@ public class Menu extends JMenuBar {
     }
 
     private void setSendViaMailFunct() {
-        sendViaMail = new JMenuItem("Invia mail");
+        sendNewMail = new JMenuItem("Nuova mail");
         setSendViaMailAction();
     }
 
     private void setSendViaMailAction() {
-        sendViaMail.addActionListener(e -> {
+        sendNewMail.addActionListener(e -> {
             if (senderMailFrame == null || !senderMailFrame.isDisplayable()) {
                 SwingUtilities.invokeLater(() -> senderMailFrame = new EmailSenderFrame(mainPanel));
             } else {
@@ -158,7 +160,7 @@ public class Menu extends JMenuBar {
                 }
             }
 
-            EnvFileManager.updateEnvFile(email, password);
+            EnvFileManager.updateCredentialsEnvFile(email, password);
         });
     }
 
@@ -177,17 +179,47 @@ public class Menu extends JMenuBar {
         JMenu emailMenu = new JMenu("Email");
         JMenu fileMenu = new JMenu("File");
         JMenu helpMenu = new JMenu("Help");
+        savedUserMenu = new JMenu("Invia a");
 
         helpMenu.add(exit);
-        emailMenu.add(sendViaMail);
+        emailMenu.add(sendNewMail);
         emailMenu.add(credentials);
         emailMenu.add(showCredentials);
+
+        List<String> emails = EnvFileManager.readSavedEmails();
+        loadSavedEmailActionListener(emails);
 
         fileMenu.add(importFile);
         fileMenu.add(exportFile);
 
+        emailMenu.add(savedUserMenu);
         add(fileMenu);
         add(emailMenu);
         add(helpMenu);
+    }
+
+    public void reloadSavedEmails() {
+        List<String> emails = EnvFileManager.readSavedEmails();
+        savedUserMenu.removeAll();
+        loadSavedEmailActionListener(emails);
+        savedUserMenu.repaint();
+        savedUserMenu.revalidate();
+    }
+
+    private void loadSavedEmailActionListener(List<String> emails) {
+        for (String email : emails) {
+            if (!email.isEmpty()) {
+                JMenuItem menuItem = new JMenuItem(email);
+                menuItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SwingUtilities.invokeLater(() -> {
+                            new EmailSenderFrame(mainPanel, email);
+                        });
+                    }
+                });
+                savedUserMenu.add(menuItem);
+            }
+        }
     }
 }

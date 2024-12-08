@@ -39,13 +39,39 @@ public class EnvFileManager {
         return envVars;
     }
 
-    public static void updateEnvFile(String email, String password) {
+    public static List<String> readSavedEmails(){
+        List<String> emails = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(ENV_FILE_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if(line.startsWith("SAVEDMAIL")){
+                    String[] parts = line.split("=", 2);
+                    if (parts.length == 2) {
+                        emails.add(parts[1].trim());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return emails;
+    }
+
+    public static void updateCredentialsEnvFile(String email, String password) {
 
         Map<String, String> envVars = readEnvFile();
 
         envVars.put("EMAIL", email);
         envVars.put("PASSWORD", password);
 
+        writeEnvFile(envVars);
+
+        System.out.println("File .env aggiornato!");
+    }
+
+    private static void writeEnvFile(Map<String, String> envVars) {
         // Scrive i nuovi valori nel file .env
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ENV_FILE_PATH))) {
             for (Map.Entry<String, String> entry : envVars.entrySet()) {
@@ -55,8 +81,31 @@ public class EnvFileManager {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
 
-        System.out.println("File .env aggiornato!");
+    public static void updateEmailsEnvFile(String email){
+        Map<String, String> readEnvVars = EnvFileManager.readEnvFile();
+
+        boolean check = false;
+
+        for(Map.Entry<String, String> entry : readEnvVars.entrySet()){
+            if(entry.getKey().startsWith("SAVEDMAIL") && entry.getValue().isEmpty()){
+                readEnvVars.put(entry.getKey(), email);
+                check = true;
+                break;
+            }
+        }
+
+        if(!check){
+            for(int i = 1; i<= 5; i++){
+                if((i+1)>5){
+                    readEnvVars.put("SAVEDMAIL"+i, email);
+                }else{
+                    readEnvVars.put("SAVEDMAIL"+i, readEnvVars.get("SAVEDMAIL"+(i+1)));
+                }}
+        }
+
+        writeEnvFile(readEnvVars);
     }
 
     public static void initializeEnvFile() {
@@ -77,6 +126,16 @@ public class EnvFileManager {
                     bw.write("EMAIL=");
                     bw.newLine();
                     bw.write("PASSWORD=");
+                    bw.newLine();
+                    bw.write("SAVEDMAIL1=");
+                    bw.newLine();
+                    bw.write("SAVEDMAIL2=");
+                    bw.newLine();
+                    bw.write("SAVEDMAIL3=");
+                    bw.newLine();
+                    bw.write("SAVEDMAIL4=");
+                    bw.newLine();
+                    bw.write("SAVEDMAIL5=");
                     bw.newLine();
                 }
                 System.out.println("File .env inizializzato: " + ENV_FILE_PATH);

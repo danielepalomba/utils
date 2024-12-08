@@ -3,13 +3,27 @@ package org.app.components;
 import org.app.exception.FieldIncomplete;
 import org.app.mail.MailSender;
 import org.app.mail.TextFileGenerator;
+import org.app.util.filemanager.EnvFileManager;
 
 import javax.swing.*;
 import java.awt.*;
 
 
 public class EmailSenderFrame extends JFrame {
+
+    private final MainPanel mainPanel;
+
     public EmailSenderFrame(MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
+        init();
+    }
+
+    public EmailSenderFrame(MainPanel mainPanel, String email) {
+        this.mainPanel = mainPanel;
+        init(email);
+    }
+
+    private void init(String...strings){
         // Configurazione della JFrame
         setTitle("Invio Email");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -35,6 +49,9 @@ public class EmailSenderFrame extends JFrame {
         gbc.weightx = 1.0;
         panel.add(emailField, gbc);
         gbc.weightx = 0;
+        if(strings.length > 0){
+            emailField.setText(strings[0]);
+        }
 
         // Campo per l'oggetto della mail
         JLabel subjectLabel = new JLabel("Oggetto*:");
@@ -77,6 +94,11 @@ public class EmailSenderFrame extends JFrame {
             String body = bodyArea.getText();
             String fileName = fileField.getText();
 
+            if(!EnvFileManager.readEnvFile().containsValue(receiver)){
+                EnvFileManager.updateEmailsEnvFile(receiver);
+                mainPanel.getMenuBar().reloadSavedEmails();
+            }
+
             // Stampa i dati in console per verifica
             System.out.println("Destinatario: " + receiver);
             System.out.println("Oggetto: " + subject);
@@ -84,10 +106,13 @@ public class EmailSenderFrame extends JFrame {
             System.out.println("File allegato: " + fileName);
 
             try {
-                areValidFields(receiver, subject, body);
-                MailSender.sendSerialsViaMail(body, subject, receiver, fileName, TextFileGenerator.createTempFileWithContent(mainPanel.getTextArea().getText()));
-                JOptionPane.showMessageDialog(EmailSenderFrame.this, "Email inviata con successo!", "Conferma", JOptionPane.INFORMATION_MESSAGE);
-                EmailSenderFrame.this.dispose();
+                areValidFields(receiver, subject, fileName);
+                if(!mainPanel.getTextArea().getText().startsWith(MainPanel.placeholder) && !mainPanel.isEmptyArea()) {
+                    MailSender.sendSerialsViaMail(body, subject, receiver, fileName, TextFileGenerator.createTempFileWithContent(mainPanel.getTextArea().getText()));
+                    JOptionPane.showMessageDialog(EmailSenderFrame.this, "Email inviata con successo!", "Conferma", JOptionPane.INFORMATION_MESSAGE);
+                    EmailSenderFrame.this.dispose();
+                }else
+                    JOptionPane.showMessageDialog(null, "Non ci sono seriali da inviare!", "Attenzione", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Attenzione!",  JOptionPane.ERROR_MESSAGE);
             }

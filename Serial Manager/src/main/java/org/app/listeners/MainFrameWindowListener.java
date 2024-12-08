@@ -20,12 +20,16 @@ public class MainFrameWindowListener implements WindowListener {
         String backupSerials = Backuper.loadBackupFile();
         if (!backupSerials.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Salvataggio precedente trovato!", "Salvataggio recuperato", JOptionPane.INFORMATION_MESSAGE);
+            mainPanel.deletePlaceholderFromArea();
             mainPanel.getTextArea().setText(backupSerials);
         }
     }
 
     @Override
     public void windowClosing(WindowEvent e) {
+        if(mainPanel.getTextArea().getText().equals(MainPanel.placeholder)){
+            return;
+        }
         if (!mainPanel.isEmptyArea()) {
             int risp = JOptionPane.showConfirmDialog(null, "Sono presenti dei seriali, vuoi salvarli?", "Attenzione!", JOptionPane.YES_NO_OPTION);
             if (risp == JOptionPane.OK_OPTION) {

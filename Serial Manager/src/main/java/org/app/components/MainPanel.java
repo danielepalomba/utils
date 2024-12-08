@@ -29,6 +29,7 @@ public class MainPanel extends JPanel {
     Font boldFont = new Font("SansSerif", Font.BOLD, 14);
 
     private final JTextArea textArea;
+    private final Menu menu;
 
     public MainPanel() {
         setLayout(null);
@@ -58,7 +59,7 @@ public class MainPanel extends JPanel {
         alert.setBounds(scrollPanelX, scrollPanelY - 40, areaWidth, 50);
 
         // Menu
-        Menu menu = new Menu(this);
+        menu = new Menu(this);
 
         add(menu);
         add(scrollPane);
@@ -71,6 +72,7 @@ public class MainPanel extends JPanel {
     public JTextArea getTextArea() {
         return textArea;
     }
+    public Menu getMenuBar() {return menu;}
 
     public boolean isEmptyArea() {
         if (textArea.getText().trim().isEmpty())
